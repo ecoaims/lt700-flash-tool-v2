@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'" />
+    <title>LT700 Firmware Tool 2.0.0</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand"><div class="brand-mark">LT</div><div><strong>LT700 Firmware Tool 2.0.0</strong><small>Production workstation</small></div></div>
+        <img id="company-logo" class="company-logo" alt="Ecoaims Precision Sport System" />
+        <div class="top-actions">
+          <span class="top-pill" id="esp-pill">ESP32 · Disconnected</span>
+          <span class="top-pill" id="ti-pill">TI · Disconnected</span>
+          <button id="guide-open" class="icon-button" type="button" title="Open operator guide" aria-label="Open operator guide">ⓘ <span>Guide</span></button>
+          <button id="settings-open" class="icon-button" title="Settings">⚙ <span>Settings</span></button>
+        </div>
+      </header>
+      <main>
+        <section class="intro">
+          <div><p class="eyebrow">LT700 FLASH STATION</p><h1>Firmware workstation</h1></div>
+          <button id="scan-all" class="secondary">↻ Scan devices & firmware</button>
+        </section>
+        <div class="mode-tabs" role="tablist" aria-label="Work mode"><button id="mode-production" role="tab" aria-selected="true" aria-controls="production-view" class="active">Production flash</button><button id="mode-development" role="tab" aria-selected="false" aria-controls="development-view">Development · Individual devices</button></div>
+        <section id="production-view" class="view sequence-card" role="tabpanel" aria-labelledby="mode-production">
+          <div class="sequence-top">
+            <div><p class="eyebrow">PRODUCTION SEQUENCE</p><h2 id="production-title">Flash ESP32, then TI</h2><p>ESP32-C6 → <span id="sequence-wait-description">10-second wait</span> → TI MSP430.</p></div>
+            <div class="sequence-actions"><button id="flash-both" class="primary large">Start production flash</button><button id="cancel-both" class="secondary" disabled>Cancel</button></div>
+          </div>
+          <div class="sequence-flow"><span>1 · ESP32-C6</span><span class="sequence-wait">2 · Wait <input id="sequence-wait-seconds" type="number" min="10" max="60" step="1" value="10" aria-label="Wait between ESP32 and TI in seconds" /> seconds <button id="sequence-wait-save" type="button" aria-label="Save wait time" title="Save wait time" disabled>✓</button></span><span>3 · TI MSP430</span></div>
+          <div class="progress-head"><strong id="sequence-status">Ready</strong><span id="sequence-progress-text">0%</span></div><progress id="sequence-progress" max="100" value="0"></progress>
+          <div class="production-prep">
+            <div class="prep-heading"><div><h3>Production firmware</h3><p id="prod-sync-status">Choose images after the online folder syncs, or attach local files.</p></div><button id="prod-sync" class="secondary">↻ Sync online folder</button></div>
+            <div class="prep-grid">
+              <div class="prep-card"><div class="prep-top"><strong>ESP32-C6 images</strong><span id="prod-esp-state">Disconnected</span></div>
+                <label>Bootloader · 0x0000<select id="prod-bootloader"><option value="">Choose bootloader</option></select></label>
+                <label>Partition · 0x8000<select id="prod-partition"><option value="">Choose partition</option></select></label>
+                <label>Target · 0x10000<select id="prod-target"><option value="">Choose target</option></select></label>
+                <div class="prep-actions"><button id="prod-esp-connect" class="secondary">Connect ESP32</button><button id="prod-esp-attach" class="ghost">＋ Choose local</button></div>
+              </div>
+              <div class="prep-card"><div class="prep-top"><strong>TI MSP430 image</strong><span id="prod-ti-state">Disconnected</span></div>
+                <label>TI firmware<select id="prod-ti-firmware"><option value="">Choose TI firmware</option></select></label>
+                <p class="ti-bootloader-note">Press SW3 + SW2 to enter TI bootloader mode before connecting. Otherwise, the device will not be detected.</p>
+                <div class="prep-actions"><button id="prod-ti-connect" class="secondary">Connect TI</button><button id="prod-ti-attach" class="ghost">＋ Choose local</button></div>
+                <p class="prep-note">Online files sync from the folder in Settings. Select every image before flashing.</p>
+              </div>
+            </div>
+            <button id="prod-details" class="detail-link">Review selected images and checksums</button>
+          </div>
+        </section>
+        <section id="development-view" class="view" role="tabpanel" aria-labelledby="mode-development" hidden>
+          <div class="development-header"><div><p class="eyebrow">DEVELOPMENT</p><h2>Individual device controls</h2></div><div class="device-tabs" role="tablist" aria-label="Device"><button id="dev-esp-tab" role="tab" aria-selected="true" aria-controls="esp-station" class="active">ESP32-C6</button><button id="dev-ti-tab" role="tab" aria-selected="false" aria-controls="ti-station">TI MSP430</button></div></div>
+          <div class="stations">
+          <section id="esp-station" class="station" role="tabpanel" aria-labelledby="dev-esp-tab">
+            <div class="station-head"><div><span class="step-number">01</span><h2 id="esp-title">ESP32-C6</h2><p>Serial firmware</p></div><span id="esp-status" class="status-badge">Disconnected</span></div>
+            <div class="control-grid">
+              <label>Serial device <select id="esp-port"><option value="">Select a device</option></select></label>
+              <label>Baud rate <select id="esp-baud"><option>115200</option><option>230400</option><option>460800</option><option>921600</option><option>1500000</option></select></label>
+            </div>
+            <div class="button-row compact"><button id="esp-connect" class="secondary">Connect serial device</button><button id="esp-check" class="secondary">Check chip</button><button id="esp-scan" class="ghost">Rescan</button></div>
+            <div class="section-divider"><h3>Firmware images</h3><span>Fixed ESP32-C6 addresses</span></div>
+            <div class="firmware-stack">
+              <label class="file-row"><span><b>Bootloader</b><small>0x0000</small></span><select id="esp-bootloader"></select></label>
+              <label class="file-row"><span><b>Partition</b><small>0x8000</small></span><select id="esp-partition"></select></label>
+              <label class="file-row"><span><b>Target</b><small>0x10000</small></span><select id="esp-target"></select></label>
+            </div>
+            <div class="button-row compact"><button id="esp-attach" class="ghost">＋ Attach local</button><button id="esp-online" class="ghost">↓ Online folder</button><button id="esp-firmware-scan" class="ghost">↻ Scan files</button></div>
+            <button id="esp-detail-open" class="detail-link">Image details and checksums</button><div id="esp-file-detail" hidden></div>
+            <label class="check-row"><input id="esp-verify" type="checkbox" checked /><span>Verify each image after flashing</span></label>
+            <div class="progress-head"><strong id="esp-step">Ready</strong><span id="esp-progress-text">0%</span></div><progress id="esp-progress" max="100" value="0"></progress>
+            <div class="station-actions"><button id="esp-flash" class="primary">Flash ESP32</button><button id="esp-erase" class="danger-outline">Erase flash</button><button id="esp-cancel" class="secondary" disabled>Cancel</button></div>
+          </section>
+          <section id="ti-station" class="station" role="tabpanel" aria-labelledby="dev-ti-tab" hidden>
+            <div class="station-head"><div><span class="step-number">02</span><h2 id="ti-title">TI MSP430</h2><p>USB HID / BSL5 firmware</p></div><span id="ti-status" class="status-badge">Disconnected</span></div>
+            <p class="ti-bootloader-note">Press SW3 + SW2 to enter TI bootloader mode before connecting. Otherwise, the device will not be detected.</p>
+            <div class="device-box"><span id="ti-device-text">VID 2047 · PID 0200 · Device not selected</span><div class="button-row compact"><button id="ti-connect" class="secondary">Connect HID device</button><button id="ti-check" class="secondary">Check device</button><button id="ti-scan" class="ghost">Rescan</button></div></div>
+            <div class="section-divider"><h3>Firmware image</h3><span>Intel HEX or TI-Text</span></div>
+            <label>TI firmware <select id="ti-firmware"></select></label>
+            <div class="button-row compact"><button id="ti-attach" class="ghost">＋ Attach local</button><button id="ti-online" class="ghost">↓ Online folder</button><button id="ti-firmware-scan" class="ghost">↻ Scan files</button></div>
+            <button id="ti-detail-open" class="detail-link">Image details and checksum</button><div id="ti-file-detail" hidden></div>
+            <div class="ti-sequence"><h3>Programming sequence</h3><ol><li>Mass erase and unlock</li><li>Upload RAM BSL</li><li>Reconnect HID</li><li>Program firmware and reset</li></ol></div>
+            <div class="progress-head"><strong id="ti-step">Ready</strong><span id="ti-progress-text">0%</span></div><progress id="ti-progress" max="100" value="0"></progress>
+            <div class="station-actions"><button id="ti-flash" class="primary">Flash TI</button><button id="ti-cancel" class="secondary" disabled>Cancel</button></div>
+          </section>
+        </div>
+        </section>
+        <aside class="log-card" aria-labelledby="log-title"><div class="log-head"><div><p class="eyebrow">EVENT LOG</p><h2 id="log-title">Workstation activity</h2></div><div class="log-controls"><button id="log-expand" class="ghost" title="Expand event log">Expand</button><button id="log-close" class="icon-button" title="Close event log" aria-label="Close event log">✕</button></div></div><div id="event-log" role="log" aria-live="polite"></div><div class="log-footer"><button id="open-logs" class="ghost">Open Documents/LT700</button></div></aside>
+        <button id="log-reopen" class="secondary" hidden>Show event log</button>
+      </main>
+      <footer>LT700 Firmware Tool 2.0.0 <span>Production flashing requires device and firmware confirmation.</span></footer>
+    </div>
+    <dialog id="settings-dialog"><form method="dialog"><div class="dialog-head"><div><p class="eyebrow">PREFERENCES</p><h2>Settings</h2></div><button class="icon-button" value="cancel" aria-label="Close settings">✕</button></div><div class="settings-body"><label>Theme<select id="setting-theme"><option value="system">Use system setting</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>SeaDrive public folder link<input id="setting-source" type="url" placeholder="https://your-seafile-server/d/.../" spellcheck="false" /></label><label>Online refresh<select id="setting-online-refresh"><option value="both">At launch and on demand</option><option value="manual">On demand only</option></select></label><h3>Keyboard shortcuts</h3><p class="settings-help">Click a field, then press a key combination. Shortcuts work while this app is focused.</p><div id="shortcut-fields" class="shortcut-fields"></div></div><div class="dialog-actions"><button value="cancel" class="secondary">Cancel</button><button id="settings-save" value="save" class="primary">Save settings</button></div></form></dialog>
+    <dialog id="online-dialog"><div class="dialog-head"><div><p class="eyebrow">SEADRIVE</p><h2>Online firmware</h2></div><button id="online-close" class="icon-button" aria-label="Close online firmware">✕</button></div><p id="online-message">Checking folder…</p><div id="online-items"></div><div class="dialog-actions"><button id="online-refresh" class="secondary">Refresh</button><button id="online-done" class="primary">Done</button></div></dialog>
+    <dialog id="firmware-detail-dialog"><div class="dialog-head"><div><p class="eyebrow">FIRMWARE</p><h2 id="firmware-detail-title">Image details</h2></div><button id="firmware-detail-close" class="icon-button" aria-label="Close image details">✕</button></div><pre id="firmware-detail-content"></pre><div class="dialog-actions"><button id="firmware-detail-done" class="primary">Done</button></div></dialog>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

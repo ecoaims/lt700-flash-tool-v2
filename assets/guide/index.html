@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>LT700 Firmware Tool 2.0.0 - Operator Guide</title>
+  <link rel="stylesheet" href="guide.css">
+  <link rel="stylesheet" href="markers.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand"><img src="../images/company_logo.png" alt="Ecoaims"><div><span class="eyebrow">OPERATOR GUIDE</span><h1>LT700 Firmware Tool <span>2.0.0</span></h1></div></div>
+    <p>Production flashing and device operation</p>
+  </header>
+  <div class="layout">
+    <nav aria-label="Guide sections">
+      <strong>Contents</strong>
+      <a href="#production">01 &nbsp; Production</a>
+      <a href="#firmware">02 &nbsp; Firmware files</a>
+      <a href="#esp">03 &nbsp; ESP32</a>
+      <a href="#ti">04 &nbsp; TI MSP430</a>
+      <a href="#settings">05 &nbsp; Settings</a>
+      <a href="#logs">06 &nbsp; Logs and recovery</a>
+      <small>Print or save this guide with Ctrl+P on Windows or Cmd+P on macOS.</small>
+    </nav>
+    <main>
+      <div class="intro"><p class="eyebrow">VERSION 2.0.0</p><h2>From device connection to completed flash</h2><p>Follow the numbered markers in each screenshot. The screenshots show the app controls and were captured on macOS; the operating controls are the same in the Windows build.</p></div>
+
+      <section id="production" class="section">
+        <div class="section-head"><span>01</span><div><p class="eyebrow">PRODUCTION SEQUENCE</p><h2>Flash ESP32, wait, then flash TI</h2></div></div>
+        <figure class="shot full production" aria-label="Marked Production screen">
+          <img src="images/production.png" alt="Production screen with firmware selectors, wait field, progress, and event log">
+          <i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i>
+        </figure>
+        <ol class="marker-list"><li>Sync the SeaDrive folder and wait for the ready count.</li><li>Choose ESP bootloader, partition, and target images.</li><li>Press <strong>SW3 + SW2</strong> to enter TI bootloader mode before Connect TI; then select the TI image.</li><li>Enter 10-60 seconds and click the tick to save. Leaving the field empty saves 10 seconds.</li><li>Connect both devices, review names and SHA-256 values, then start and confirm the flash.</li><li>Watch the progress bar and event log. Cancel if needed.</li></ol>
+        <p class="note">Production files come from the current online sync or files explicitly attached with Choose local. Every image slot requires an operator selection. The sequence stops if the ESP32 step fails.</p>
+      </section>
+
+      <section id="firmware" class="section">
+        <div class="section-head"><span>02</span><div><p class="eyebrow">FIRMWARE SOURCES</p><h2>Online folder and local files</h2></div></div>
+        <p>Production uses <strong>Sync online folder</strong> and downloads supported files into its selectors. In Development, <strong>Online folder</strong> opens the dialog shown below so an individual file can be downloaded. Use <strong>Choose local</strong> in Production or <strong>Attach local</strong> in Development for files on the workstation.</p>
+        <figure class="shot crop online" aria-label="Marked online firmware dialog"><img src="images/online-dialog.png" alt="SeaDrive online firmware dialog"><i>1</i><i>2</i><i>3</i></figure>
+        <ol class="marker-list"><li>Download a selected file for Development.</li><li>Refresh the listing from the configured SeaDrive share.</li><li>Click Done and choose the downloaded file.</li></ol>
+        <p class="note">Supported files: ESP32 <code>.bin</code>; TI Intel HEX <code>.hex</code> or TI-Text <code>.txt</code>, <code>.titxt</code>, <code>.titext</code>. Check filenames and SHA-256 before flashing.</p>
+      </section>
+
+      <section id="esp" class="section">
+        <div class="section-head"><span>03</span><div><p class="eyebrow">DEVELOPMENT</p><h2>Individual ESP32-C6 controls</h2></div></div>
+        <figure class="shot full esp" aria-label="Marked ESP32 screen"><img src="images/development-esp.png" alt="ESP32 serial connection and flashing controls"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></figure>
+        <ol class="marker-list"><li>Connect serial device, then select the port and baud rate.</li><li>Review bootloader, partition, and target at fixed addresses <code>0x0000</code>, <code>0x8000</code>, and <code>0x10000</code>.</li><li>Attach local or download online images, then rescan if needed.</li><li>Keep Verify enabled when post-flash verification is required.</li><li>Use Check chip or Flash ESP32; confirm before programming.</li><li>Erase flash clears all ESP contents and requires confirmation.</li></ol>
+      </section>
+
+      <section id="ti" class="section">
+        <div class="section-head"><span>04</span><div><p class="eyebrow">DEVELOPMENT</p><h2>Individual TI MSP430 controls</h2></div></div>
+        <figure class="shot full ti" aria-label="Marked TI screen"><img src="images/development-ti.png" alt="TI bootloader instruction, HID connection, firmware selector and progress"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></figure>
+        <ol class="marker-list"><li>Press <strong>SW3 + SW2</strong> to enter TI bootloader mode before connecting. Otherwise, the device will not be detected. Connect HID device (VID 2047, PID 0200).</li><li>Select the intended TI HEX or TI-Text image.</li><li>Attach local, download online, or rescan firmware.</li><li>The sequence mass-erases, uploads RAM BSL, and reconnects HID.</li><li>Click Flash TI and confirm the destructive operation.</li><li>Monitor progress and the event log.</li></ol>
+      </section>
+
+      <section id="settings" class="section">
+        <div class="section-head"><span>05</span><div><p class="eyebrow">PREFERENCES</p><h2>Theme, SeaDrive link, and hotkeys</h2></div></div>
+        <div class="split"><figure class="shot crop settings" aria-label="Marked Settings dialog"><img src="images/settings-dialog.png" alt="Settings dialog with theme, SeaDrive, refresh, and shortcuts"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></figure><ol class="marker-list"><li>Choose System, Light, or Dark theme.</li><li>Edit the public HTTPS SeaDrive folder link. Sync after changing it.</li><li>Choose launch and on-demand refresh, or on-demand only.</li><li>Click a shortcut field, then press a key combination. Shortcuts work while the app is focused.</li><li>Scroll inside Settings for the remaining actions, then Save settings.</li></ol></div>
+        <p class="note">Assignable actions: scan devices, scan firmware, flash ESP32, flash TI, flash both, cancel, check ESP32, and open Settings. Backspace or Delete clears a shortcut; duplicate combinations are rejected.</p>
+      </section>
+
+      <section id="logs" class="section">
+        <div class="section-head"><span>06</span><div><p class="eyebrow">COMPLETION</p><h2>Logs, results, and recovery</h2></div></div>
+        <div class="split"><figure class="shot crop log" aria-label="Marked event log"><img src="images/event-log.png" alt="Event log with Expand and Open Documents/LT700 controls"><i>1</i><i>2</i></figure><div><ol class="marker-list"><li>Expand or close the event log. After an operation, read the final success, failure, or cancellation result.</li><li>Open <code>Documents/LT700</code> to find the automatically saved, timestamped flash, erase, or check log.</li></ol><h3>If something stops</h3><ul><li>No ESP serial port: check USB cable, power, and CP210x driver, then Rescan.</li><li>No TI HID device: press SW3 + SW2, reconnect, then Check device.</li><li>SeaDrive unavailable: check the link and network, retry Sync, or Choose local files.</li><li>Image or checksum mismatch: stop and select the intended firmware.</li><li>Cancelled or failed flash: treat the unit as incomplete. Review its log and repeat the full intended sequence.</li></ul></div></div>
+        <p class="note">Functional acceptance of flashing and USB detection still requires real LT700 hardware.</p>
+      </section>
+      <footer>Ecoaims · LT700 Firmware Tool 2.0.0 · Operator guide</footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+release-preview*/
+release-guide*/
+tmp/pdfs/
+build/icon.iconset/
+*.log
